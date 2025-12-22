@@ -7,154 +7,108 @@ description: A simple guide on how to provide your internet to URnetwork for Lin
 import Callout from "@/components/Alerts/Callout";
 
 <Callout type="danger">
-    PAGE NOT FINISHED: TEMPORARY PLACEHOLDER PAGE. INSTRUCTIONS MAY BE WRONG!!!
+    PAGE NOT FINISHED: TEMPORARY PLACEHOLDER PAGE. INSTRUCTIONS MAY BE WRONG!!!
 </Callout>
 
 # Providing to URnetwork
 
-To provide your internet to URnetwork, you run a small provider application
-on your system, which shares your internet with the network.  This application
-is often referred to as the "provider binary" or "provider executable".
+To share your internet with URnetwork, you'll need to run a small "provider" application on your computer. This software handles the connection between your system and the network.
 
-We maintain URnetwork provider binaries for many platforms and architectures,
-including GNU/Linux, macOS and Windows.  We'll give you a short guide on how
-set them up on your system.
+We provide these applications for GNU/Linux, macOS, and Windows. This guide will help you get set up on Linux in just a few steps.
 
-## GNU/Linux
+## GNU/Linux Setup
+
 <Callout type="warning">
-The installation script requires you have the following installed:
+**Prerequisites**
+Before starting, ensure your system has these basic tools installed:
+ * [cURL](https://curl.se)
+ * Either [jq](https://jqlang.org) or [Python 3.8+](https://python.org)
+ * A standard terminal (POSIX-compatible shell)
 
- * [cURL](https://curl.se)
- * Either [jq](https://jqlang.org) or [Python 3.8+](https://python.org)
- * A POSIX-compatible shell
-
-Follow this link then copy and paste it inside of your terminal then hit enter (You must be root): 
-
-[Install Helper](https://raw.githubusercontent.com/urnetwork/connect/refs/heads/main/scripts/Provider_Install_Deps.sh).
-
-Or just install using your chosen package manager.
+If you aren't sure if you have these, you can run our [Install Helper script](https://raw.githubusercontent.com/urnetwork/connect/refs/heads/main/scripts/Provider_Install_Deps.sh) as a root user, or install them using your distribution's package manager.
 </Callout>
 
-Run the following command to install provider for linux as well as urnet-tools:
+### 1. Installation
+Run this command in your terminal to install the provider and the **urnet-tools** helper:
 
 ```bash
 curl -fSsL https://raw.githubusercontent.com/urnetwork/connect/refs/heads/main/scripts/Provider_Install_Linux.sh | sh
 ```
 
-This command will install the latest URnetwork provider binary, and a small
-helper tool called **urnet-tools**.
-
-Most modern GNU/Linux systems already have these installed, so you usually
-won't have to worry about them.  But if yours does not have these, or if you
-use a very minimal system, you will have to consult your Distro's packaging
-system to figure out how to install them.
-
-After you run this script, you should follow the steps in the [post install instructions section](#post-install-instructions).
-
-
-### Post-install instructions
-
-The first thing to do after installation is to re-source your `~/.bashrc`. To do so, run:
+### 2. Post-Install Setup
+To make sure your system recognizes the new `urnetwork` commands, refresh your shell configuration:
 
 ```bash
 source ~/.bashrc
 ```
 
-This will ensure urnetwork commands work from now on.
-
 <Callout type="info">
-    If you do not use bash as your default shell, the installer will create a `~/.bashrc` file,
-    which you should open up and copy paste its contents into your shell's profile or `*rc` file accordingly.
+    **Not using Bash?** If you use a different shell (like Zsh or Fish), the installer will still create a `~/.bashrc` file. Simply copy the contents of that file into your specific shell profile.
 </Callout>
 
-To further verify that your installation was successful, run:
-
+To verify the installation worked, try running these help commands:
 ```bash
 urnetwork --help
 urnet-tools --help
 ```
 
-Both of these commands should print out help instructions.
-
-### Authentication
-
-Next, you have to log into URnetwork. To do so, run:
+### 3. Linking Your Account
+You need to log in to connect your provider to your URnetwork account:
 
 ```bash
 urnetwork auth
 ```
 
-Then:
+When prompted, enter your **Auth Code**. You can find this code in the settings section of the [UR.io dashboard](https://ur.io), the [Web App](https://app.ur.network), or the mobile app.
 
-It will ask for an auth code. You can obtain an auth code at https://ur.io, https://app.ur.network or inside the mobile app.
-The auth code button should be located in the settings section of their respective app.
+
 
 <img src="https://raw.githubusercontent.com/virtual-designer/urnetwork-docs/refs/heads/main/app/(content)/urio_auth.png" height="335px" width="576px" />
-<img src="https://raw.githubusercontent.com/virtual-designer/urnetwork-docs/refs/heads/main/app/(content)/web_app_auth.png" height="1199px" width="2348px" />
-<img src="https://raw.githubusercontent.com/virtual-designer/urnetwork-docs/refs/heads/main/app/(content)/mobile_auth.png" height="907px" width="1179px" />
 
+*Note: Your login token is saved privately at `~/.urnetwork/jwt`. Keep this file secure and do not share it.*
 
-If your auth code was correctly copied, you should be logged into URnetwork now. The command above saves your account
-JWT token to `~/.urnetwork/jwt`. You should not share this with anyone.
-
-### Starting the provider
-
-Finally, you can start the provider:
+### 4. Starting the Provider
+Now you are ready to start sharing your connection:
 
 ```bash
 urnet-tools start
 ```
 
-Or if you want to run it in the foreground for your own purposes
-
-```bash
-urnetwork provide
-```
-
-Keep in mind if you close the foreground process it will die, so it's recommeneded to use urnet-tools to create a service automatically.
-
-Next, it's also recommended to allow to service to startup when you restart your system so you won't have to worry about manually starting it.
-
-Use the following to enable system startup:
+To ensure the provider starts automatically whenever your computer reboots, run:
 
 ```bash
 urnet-tools auto-start on
 ```
 
-This will enable the service, use `off` to turn startup off.
+### 5. Keeping the Connection Alive (Lingering)
+On Linux, user-run applications often stop the moment you log out or close your terminal window. To keep your provider online 24/7, you must enable **lingering**:
 
-If everything was set up correctly, this will not produce any output. To see the status of
-the service, run:
+```bash
+loginctl enable-linger
+```
 
+Check your status with:
 ```bash
 urnet-tools status
 ```
+If everything looks good, you are now successfully contributing to URnetwork!
 
-This should show that the service is active and running. Congratulations, you are now a part of
-URnetwork!
+---
 
-### Updating
+### Managing Your Provider
 
-If you'd like to manually update you can easily run:
-
+**Updating**
+Keep your software up to date manually:
 ```bash
 urnet-tools update
 ```
-
-This command also allows you to choose a build version, you can find the build tag [here](https://github.com/urnetwork/connect/releases).
-
-If you prefer to not worry about it, you can set it to automatically update to the latest stable using:
-
+Or set it to update automatically every day:
 ```bash
 urnet-tools auto-update on
 ```
 
-This will check for updates daily, use `off` to turn auto updates off.
-
-### Uninstalling
-
-In case if you want to uninstall URnetwork, you can use `urnet-tools` for that:
-
+**Uninstalling**
+If you need to remove URnetwork from your system:
 ```bash
 urnet-tools uninstall
 ```
